@@ -11,6 +11,8 @@
  *******************************************************************************/
 package ccw.core;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -19,6 +21,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.swt.finder.SWTBotAssert;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +36,9 @@ import ccw.CCWPlugin;
 public class SmokeTests {
 
 	public static BotUtils bot = null;
+
+	public static final String PROJECT_NAME = "my-first-clojure-project";
+	public static final String PROJECT_NAME2 = "my-second-clojure-project";
 	
 	@BeforeClass
 	public static void setupClass() throws Exception {
@@ -64,6 +73,23 @@ public class SmokeTests {
     public void swtbotDoesNotRunOnTheUIThread() throws Exception {
         assertNull(Display.getCurrent());
         assertNotSame(Thread.currentThread(), SWTUtils.display().getThread());
+    }
+	
+	@Test
+    public void updatesDependenciesOnceOnProjectCreation() throws Exception {
+        bot.createClojureProject(PROJECT_NAME2);
+        bot.bot.waitUntil(Conditions.waitForWidget(BotUtils.MATCHER_WIDGET_UPDATE_DEPENDENCIES),
+                BotUtils.TIMEOUT_UPDATE_DEPENDENCIES);
+
+        int count = 0; // AR - were is filter!?!?!
+        for (SWTBotShell shell : bot.bot.shells()) {
+            if (shell.getText().contains("Update project dependencies")) {
+                count++;
+            }
+        }
+        assertThat("Update dependencies should be launched only once on project creation",
+                count, equalTo(1));
+        bot.purgeProject(PROJECT_NAME2);
     }
 
     @Test
