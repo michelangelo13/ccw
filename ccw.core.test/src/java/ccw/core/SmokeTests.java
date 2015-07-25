@@ -23,8 +23,6 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,11 +55,8 @@ public class SmokeTests {
 	
 	@Test
 	public void canCreateANewClojureProject() throws Exception {
-		bot
-		.createClojureProject(PROJECT_NAME)
-		.sendUpdateDependeciesToBackground()
-		.assertProjectExists(PROJECT_NAME)
-		.purgeProject(PROJECT_NAME);
+		bot.createAndWaitForProject(PROJECT_NAME)
+		   .purgeProject(PROJECT_NAME);
 	}
 	
 	@Test
